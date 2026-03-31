@@ -8,6 +8,12 @@ import {
   ActivityType,
 } from "../types";
 import { calculateDailyDose } from "../services/doseEngine";
+import {
+  isHealthConnectAvailable,
+  initializeHealthConnect,
+  requestPermissions,
+  getTodayActivities,
+} from "../services/healthConnect";
 
 const STORAGE_KEYS = {
   CITY: "breathesafe_city",
@@ -22,6 +28,8 @@ interface AppState {
   pm25: number;
   isLoading: boolean;
   hasOnboarded: boolean;
+  healthConnectAvailable: boolean;
+  healthConnectEnabled: boolean;
 
   todayActivities: ActivityEntry[];
   todayResult: DoseResult | null;
@@ -45,6 +53,8 @@ interface AppState {
 
   setOnboarded: () => void;
   loadPersistedData: () => Promise<void>;
+  syncHealthConnect: () => Promise<void>;
+  enableHealthConnect: () => Promise<boolean>;
 }
 
 const DEFAULT_WORKDAY: ActivityEntry[] = [
@@ -70,6 +80,8 @@ const useStore = create<AppState>((set, get) => ({
   pm25: 25,
   isLoading: true,
   hasOnboarded: false,
+  healthConnectAvailable: false,
+  healthConnectEnabled: false,
 
   todayActivities: DEFAULT_WORKDAY,
   todayResult: null,
@@ -175,6 +187,48 @@ const useStore = create<AppState>((set, get) => ({
     AsyncStorage.setItem(STORAGE_KEYS.ONBOARDED, "true");
   },
 
+  syncHealthConnect: async () => {
+    const { healthConnectEnabled } = get();
+    if (!healthConnectEnabled) return;
+
+    try {
+      const hcActivities = await getTodayActivities();
+      if (hcActivities.length > 0) {
+        const current = get().todayActivities;
+        // Keep manually-added activities (cooking etc) and replace auto-detected ones
+        const manualTypes = new Set([
+          "cooking_gas", "cooking_electric", "cooking_gas_hood",
+          "cooking_electric_hood", "driving", "public_transport",
+        ]);
+        const manualActivities = current.filter((a) =>
+          manualTypes.has(a.activity_type)
+        );
+        const merged = [...hcActivities, ...manualActivities];
+        set({ todayActivities: merged });
+        get().recalculate();
+      }
+    } catch (e) {
+      console.error("Health Connect sync failed:", e);
+    }
+  },
+
+  enableHealthConnect: async () => {
+    try {
+      const initialized = await initializeHealthConnect();
+      if (!initialized) return false;
+
+      const granted = await requestPermissions();
+      if (granted) {
+        set({ healthConnectEnabled: true });
+        await get().syncHealthConnect();
+        return true;
+      }
+    } catch (e) {
+      console.error("Health Connect enable failed:", e);
+    }
+    return false;
+  },
+
   loadPersistedData: async () => {
     try {
       const [cityJson, templatesJson, historyJson, onboarded] =
@@ -195,6 +249,9 @@ const useStore = create<AppState>((set, get) => ({
       if (templatesJson) updates.templates = JSON.parse(templatesJson);
       if (historyJson) updates.history = JSON.parse(historyJson);
       if (onboarded === "true") updates.hasOnboarded = true;
+
+      const hcAvailable = await isHealthConnectAvailable();
+      updates.healthConnectAvailable = hcAvailable;
 
       set(updates);
       get().recalculate();
