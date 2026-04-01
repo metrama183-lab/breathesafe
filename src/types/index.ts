@@ -19,7 +19,7 @@ export interface ActivityEntry {
 }
 
 export interface ActivityBreakdown {
-  activity: string;
+  activity: ActivityType;
   duration_hours: number;
   effective_pm25: number;
   breathing_rate: number;

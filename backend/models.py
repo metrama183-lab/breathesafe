@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from enum import Enum
 
@@ -20,7 +20,7 @@ class ActivityType(str, Enum):
 
 class ActivityEntry(BaseModel):
     activity_type: ActivityType
-    duration_hours: float
+    duration_hours: float = Field(ge=0, le=24)
     is_outdoor: bool = False
 
 

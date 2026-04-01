@@ -98,7 +98,6 @@ def calculate_daily_dose(
     total_dose = 0.0
     total_cigarettes = 0.0
     total_hours = 0.0
-    weighted_pm25_sum = 0.0
 
     for activity in activities:
         result = calculate_activity_dose(activity, outdoor_pm25)
@@ -106,9 +105,6 @@ def calculate_daily_dose(
         total_dose += result["dose_ug"]
         total_cigarettes += result["cigarettes"]
         total_hours += activity.duration_hours
-        weighted_pm25_sum += result["effective_pm25"] * activity.duration_hours
-
-    weighted_avg_pm25 = weighted_pm25_sum / max(total_hours, 1.0)
 
     recommendations = _generate_recommendations(breakdown, outdoor_pm25)
 
@@ -132,7 +128,7 @@ def calculate_health_impact(
     risk_increase = (annual_avg_pm25 / 10.0) * RELATIVE_RISK_PER_10UG * 100
 
     return HealthImpact(
-        annual_cigarettes=round(cigarettes_per_day * 365, 0),
+        annual_cigarettes=round(cigarettes_per_day * 365),
         who_limit_ratio=round(who_ratio, 1),
         estimated_hours_lost_per_year=round(hours_lost, 1),
         respiratory_risk_increase_pct=round(risk_increase, 1),

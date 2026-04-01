@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { ActivityBreakdown, ACTIVITY_META, ActivityType } from "../types";
+import { ActivityBreakdown, ACTIVITY_META } from "../types";
 import { COLORS, SPACING, FONT } from "../constants/theme";
 
 interface Props {
@@ -15,7 +15,7 @@ export default function DoseBreakdown({ breakdown, totalCigarettes }: Props) {
     <View style={styles.container}>
       <Text style={styles.title}>Dose Breakdown</Text>
       {sorted.map((item, i) => {
-        const meta = ACTIVITY_META[item.activity as ActivityType];
+        const meta = ACTIVITY_META[item.activity];
         const pct = totalCigarettes > 0
           ? (item.cigarettes / totalCigarettes) * 100
           : 0;

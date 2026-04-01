@@ -36,6 +36,8 @@ async def refresh_air_cache():
     logger.info("Refreshing air quality cache...")
 
     api_key = os.getenv("OPENAQ_API_KEY")
+    if not api_key:
+        logger.warning("OPENAQ_API_KEY not set — using unauthenticated requests (stricter rate limits)")
     results = await fetch_all_cities(api_key)
 
     for r in results:
@@ -225,7 +227,7 @@ async def compare_cities():
             city=city_name,
             pm25_avg=round(pm25, 1),
             cigarettes_per_day=round(cig_day, 2),
-            annual_cigarettes=round(cig_day * 365, 0),
+            annual_cigarettes=round(cig_day * 365),
         ))
 
     return comparisons

@@ -272,12 +272,24 @@ const useStore = create<AppState>((set, get) => ({
       const updates: Partial<AppState> = { isLoading: false };
 
       if (cityJson) {
-        const { city, countryCode } = JSON.parse(cityJson);
-        updates.city = city;
-        updates.countryCode = countryCode;
+        try {
+          const { city, countryCode } = JSON.parse(cityJson);
+          updates.city = city;
+          updates.countryCode = countryCode;
+        } catch {
+          await AsyncStorage.removeItem(STORAGE_KEYS.CITY);
+        }
       }
-      if (templatesJson) updates.templates = JSON.parse(templatesJson);
-      if (historyJson) updates.history = JSON.parse(historyJson);
+      if (templatesJson) {
+        try { updates.templates = JSON.parse(templatesJson); } catch {
+          await AsyncStorage.removeItem(STORAGE_KEYS.TEMPLATES);
+        }
+      }
+      if (historyJson) {
+        try { updates.history = JSON.parse(historyJson); } catch {
+          await AsyncStorage.removeItem(STORAGE_KEYS.HISTORY);
+        }
+      }
       if (onboarded === "true") updates.hasOnboarded = true;
 
       const hcAvailable = await isHealthConnectAvailable();

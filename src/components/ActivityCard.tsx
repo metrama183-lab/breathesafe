@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { ActivityEntry, ACTIVITY_META, ActivityType } from "../types";
+import { ActivityEntry, ACTIVITY_META } from "../types";
 import { COLORS, SPACING, FONT } from "../constants/theme";
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function ActivityCard({ activity, index, onRemove }: Props) {
-  const meta = ACTIVITY_META[activity.activity_type as ActivityType];
+  const meta = ACTIVITY_META[activity.activity_type];
 
   return (
     <View style={styles.card}>
