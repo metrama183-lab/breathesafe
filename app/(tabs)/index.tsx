@@ -4,6 +4,7 @@ import useStore from "../../src/store/useStore";
 import CigaretteGauge from "../../src/components/CigaretteGauge";
 import DoseBreakdown from "../../src/components/DoseBreakdown";
 import RecommendationCard from "../../src/components/RecommendationCard";
+import WhatIfSimulator from "../../src/components/WhatIfSimulator";
 import { COLORS, SPACING, FONT } from "../../src/constants/theme";
 import { WHO_PM25_LIMIT } from "../../src/constants/science";
 
@@ -11,6 +12,7 @@ export default function HomeScreen() {
   const city = useStore((s) => s.city);
   const pm25 = useStore((s) => s.pm25);
   const todayResult = useStore((s) => s.todayResult);
+  const todayActivities = useStore((s) => s.todayActivities);
   const recalculate = useStore((s) => s.recalculate);
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -68,6 +70,12 @@ export default function HomeScreen() {
           <DoseBreakdown
             breakdown={todayResult.breakdown}
             totalCigarettes={cigarettes}
+          />
+          <View style={{ height: SPACING.md }} />
+          <WhatIfSimulator
+            activities={todayActivities}
+            outdoorPm25={pm25}
+            currentCigarettes={cigarettes}
           />
           <View style={{ height: SPACING.md }} />
           <RecommendationCard recommendations={todayResult.recommendations} />
