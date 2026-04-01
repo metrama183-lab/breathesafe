@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Stack } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
 import useStore from "../src/store/useStore";
@@ -8,10 +8,25 @@ import { COLORS } from "../src/constants/theme";
 export default function RootLayout() {
   const loadPersistedData = useStore((s) => s.loadPersistedData);
   const isLoading = useStore((s) => s.isLoading);
+  const hasOnboarded = useStore((s) => s.hasOnboarded);
+  const router = useRouter();
+  const segments = useSegments();
 
   useEffect(() => {
     loadPersistedData();
   }, []);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const inOnboarding = segments[0] === "onboarding";
+
+    if (!hasOnboarded && !inOnboarding) {
+      router.replace("/onboarding");
+    } else if (hasOnboarded && inOnboarding) {
+      router.replace("/(tabs)");
+    }
+  }, [isLoading, hasOnboarded, segments]);
 
   if (isLoading) {
     return (
@@ -31,7 +46,10 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: COLORS.bg },
           animation: "fade",
         }}
-      />
+      >
+        <Stack.Screen name="onboarding" />
+        <Stack.Screen name="(tabs)" />
+      </Stack>
     </>
   );
 }

@@ -39,6 +39,7 @@ interface AppState {
 
   setCity: (city: string, countryCode: string) => void;
   setPm25: (pm25: number) => void;
+  fetchAirQuality: (city: string) => Promise<void>;
 
   setTodayActivities: (activities: ActivityEntry[]) => void;
   addActivity: (activity: ActivityEntry) => void;
@@ -92,13 +93,42 @@ const useStore = create<AppState>((set, get) => ({
   ],
   history: [],
 
-  setCity: (city, countryCode) => {
+  setCity: async (city, countryCode) => {
     set({ city, countryCode });
     AsyncStorage.setItem(STORAGE_KEYS.CITY, JSON.stringify({ city, countryCode }));
+    await get().fetchAirQuality(city);
   },
 
   setPm25: (pm25) => {
     set({ pm25 });
+    get().recalculate();
+  },
+
+  fetchAirQuality: async (city) => {
+    try {
+      const res = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000"}/air/city/${encodeURIComponent(city)}`
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (data.pm25 && data.pm25 > 0) {
+          set({ pm25: data.pm25 });
+          get().recalculate();
+          return;
+        }
+      }
+    } catch {}
+    // Fallback: use known city averages when backend is unavailable
+    const FALLBACK: Record<string, number> = {
+      milano: 25, roma: 16, torino: 28, napoli: 18, bologna: 22,
+      firenze: 15, london: 11, paris: 14, berlin: 12, madrid: 10,
+      barcelona: 13, amsterdam: 11, stockholm: 6, wien: 13, zürich: 10,
+      bruxelles: 12, lisboa: 9, warszawa: 21, praha: 17, budapest: 19,
+      "new delhi": 99, beijing: 42, tokyo: 12, "new york": 10,
+      "los angeles": 14, "são paulo": 17,
+    };
+    const fallback = FALLBACK[city.toLowerCase()] ?? 15;
+    set({ pm25: fallback });
     get().recalculate();
   },
 
@@ -255,6 +285,9 @@ const useStore = create<AppState>((set, get) => ({
 
       set(updates);
       get().recalculate();
+      // Fetch real air quality for the user's city
+      const currentCity = updates.city || get().city;
+      get().fetchAirQuality(currentCity);
     } catch (e) {
       console.error("Failed to load persisted data:", e);
       set({ isLoading: false });

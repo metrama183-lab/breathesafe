@@ -11,23 +11,24 @@ interface CityData {
   cigarettesYear: number;
 }
 
+const C = CIGARETTE_CONSTANT;
 const WORLD_CITIES: CityData[] = [
-  { city: "Stockholm", pm25: 6, cigarettesDay: 6 / 22, cigarettesYear: (6 / 22) * 365 },
-  { city: "Lisboa", pm25: 9, cigarettesDay: 9 / 22, cigarettesYear: (9 / 22) * 365 },
-  { city: "Madrid", pm25: 10, cigarettesDay: 10 / 22, cigarettesYear: (10 / 22) * 365 },
-  { city: "London", pm25: 11, cigarettesDay: 11 / 22, cigarettesYear: (11 / 22) * 365 },
-  { city: "Amsterdam", pm25: 11, cigarettesDay: 11 / 22, cigarettesYear: (11 / 22) * 365 },
-  { city: "Berlin", pm25: 12, cigarettesDay: 12 / 22, cigarettesYear: (12 / 22) * 365 },
-  { city: "Tokyo", pm25: 12, cigarettesDay: 12 / 22, cigarettesYear: (12 / 22) * 365 },
-  { city: "Paris", pm25: 14, cigarettesDay: 14 / 22, cigarettesYear: (14 / 22) * 365 },
-  { city: "Roma", pm25: 16, cigarettesDay: 16 / 22, cigarettesYear: (16 / 22) * 365 },
-  { city: "Praha", pm25: 17, cigarettesDay: 17 / 22, cigarettesYear: (17 / 22) * 365 },
-  { city: "Budapest", pm25: 19, cigarettesDay: 19 / 22, cigarettesYear: (19 / 22) * 365 },
-  { city: "Warszawa", pm25: 21, cigarettesDay: 21 / 22, cigarettesYear: (21 / 22) * 365 },
-  { city: "Milano", pm25: 25, cigarettesDay: 25 / 22, cigarettesYear: (25 / 22) * 365 },
-  { city: "Torino", pm25: 28, cigarettesDay: 28 / 22, cigarettesYear: (28 / 22) * 365 },
-  { city: "Beijing", pm25: 42, cigarettesDay: 42 / 22, cigarettesYear: (42 / 22) * 365 },
-  { city: "New Delhi", pm25: 99, cigarettesDay: 99 / 22, cigarettesYear: (99 / 22) * 365 },
+  { city: "Stockholm", pm25: 6, cigarettesDay: 6 / C, cigarettesYear: (6 / C) * 365 },
+  { city: "Lisboa", pm25: 9, cigarettesDay: 9 / C, cigarettesYear: (9 / C) * 365 },
+  { city: "Madrid", pm25: 10, cigarettesDay: 10 / C, cigarettesYear: (10 / C) * 365 },
+  { city: "London", pm25: 11, cigarettesDay: 11 / C, cigarettesYear: (11 / C) * 365 },
+  { city: "Amsterdam", pm25: 11, cigarettesDay: 11 / C, cigarettesYear: (11 / C) * 365 },
+  { city: "Berlin", pm25: 12, cigarettesDay: 12 / C, cigarettesYear: (12 / C) * 365 },
+  { city: "Tokyo", pm25: 12, cigarettesDay: 12 / C, cigarettesYear: (12 / C) * 365 },
+  { city: "Paris", pm25: 14, cigarettesDay: 14 / C, cigarettesYear: (14 / C) * 365 },
+  { city: "Roma", pm25: 16, cigarettesDay: 16 / C, cigarettesYear: (16 / C) * 365 },
+  { city: "Praha", pm25: 17, cigarettesDay: 17 / C, cigarettesYear: (17 / C) * 365 },
+  { city: "Budapest", pm25: 19, cigarettesDay: 19 / C, cigarettesYear: (19 / C) * 365 },
+  { city: "Warszawa", pm25: 21, cigarettesDay: 21 / C, cigarettesYear: (21 / C) * 365 },
+  { city: "Milano", pm25: 25, cigarettesDay: 25 / C, cigarettesYear: (25 / C) * 365 },
+  { city: "Torino", pm25: 28, cigarettesDay: 28 / C, cigarettesYear: (28 / C) * 365 },
+  { city: "Beijing", pm25: 42, cigarettesDay: 42 / C, cigarettesYear: (42 / C) * 365 },
+  { city: "New Delhi", pm25: 99, cigarettesDay: 99 / C, cigarettesYear: (99 / C) * 365 },
 ].sort((a, b) => a.pm25 - b.pm25);
 
 function CityRow({

@@ -118,8 +118,11 @@ async def fetch_nearest_pm25(
                     param = sensor.get("parameter", {})
                     if param.get("name") == "pm25" or param.get("id") == 2:
                         latest = sensor.get("latest", {})
+                        pm25_val = latest.get("value")
+                        if pm25_val is None or pm25_val <= 0:
+                            continue
                         return {
-                            "pm25": latest.get("value", 0),
+                            "pm25": pm25_val,
                             "station": location.get("name", "Unknown"),
                             "city": location.get("locality") or location.get("name"),
                             "country": location.get("country", {}).get("code", ""),

@@ -8,8 +8,8 @@ import {
   StyleSheet,
 } from "react-native";
 import { router } from "expo-router";
-import useStore from "../../src/store/useStore";
-import { COLORS, SPACING, FONT } from "../../src/constants/theme";
+import useStore from "../src/store/useStore";
+import { COLORS, SPACING, FONT } from "../src/constants/theme";
 
 const POPULAR_CITIES = [
   { city: "Milano", country: "IT" },

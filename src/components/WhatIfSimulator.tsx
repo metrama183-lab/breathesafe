@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
-import { View, Text, Switch, StyleSheet, Animated } from "react-native";
+import { View, Text, Switch, StyleSheet } from "react-native";
 import { COLORS, SPACING, FONT } from "../constants/theme";
-import { ActivityEntry, ActivityBreakdown, ACTIVITY_META, ActivityType } from "../types";
+import { ActivityEntry, ActivityType } from "../types";
 import { calculateDailyDose } from "../services/doseEngine";
 
 interface WhatIfOption {

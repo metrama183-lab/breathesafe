@@ -162,7 +162,8 @@ function mapExerciseType(exerciseType: number | string): ActivityType | null {
       return value;
     }
   }
-  return "walking";
+  // Unknown exercise types default to indoor resting (not outdoor walking)
+  return "resting";
 }
 
 export async function getAverageHeartRate(): Promise<number | null> {

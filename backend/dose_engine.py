@@ -157,10 +157,11 @@ def _generate_recommendations(
     top = sorted_activities[0] if sorted_activities else None
 
     if top and top["activity"] in ("cooking_gas", "cooking_electric"):
-        saved = top["dose_ug"] * 0.70
+        saved_cig = top["cigarettes"] * 0.70
+        saved_ug = top["dose_ug"] * 0.70
         recs.append(
-            f"Turn on the range hood when cooking: save ~{saved:.0f} µg "
-            f"({saved / CIGARETTE_CONSTANT / 24 * top['duration_hours']:.1f} cigarettes)"
+            f"Turn on the range hood when cooking: save ~{saved_ug:.0f} µg "
+            f"({saved_cig:.2f} cigarettes)"
         )
 
     if top and top["activity"] == "cooking_gas":

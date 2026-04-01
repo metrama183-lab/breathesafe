@@ -16,8 +16,8 @@ from dotenv import load_dotenv
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from models import DayLog, DoseResult, HealthImpact, CityComparison, AirQualityData
-from dose_engine import calculate_daily_dose, calculate_health_impact, CIGARETTE_CONSTANT, FALLBACK_PM25
-from openaq_worker import fetch_nearest_pm25, fetch_all_cities, get_fallback_pm25, DEFAULT_CITIES
+from dose_engine import calculate_daily_dose, calculate_health_impact, CIGARETTE_CONSTANT
+from openaq_worker import fetch_nearest_pm25, fetch_all_cities, get_fallback_pm25, DEFAULT_CITIES, FALLBACK_PM25
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
@@ -49,7 +49,21 @@ async def refresh_air_cache():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await refresh_air_cache()
+    import asyncio
+    # Load fallback data immediately so server can start serving
+    for city_info in DEFAULT_CITIES:
+        city_key = city_info["city"].lower()
+        air_cache[city_key] = {
+            "default_city": city_info["city"],
+            "pm25": FALLBACK_PM25.get(city_info["city"], 15.0),
+            "country": city_info["country"],
+            "lat": city_info["lat"],
+            "lon": city_info["lon"],
+            "station": "fallback",
+            "is_fallback": True,
+        }
+    # Refresh real data in background without blocking startup
+    asyncio.create_task(refresh_air_cache())
     scheduler.add_job(refresh_air_cache, "interval", minutes=20)
     scheduler.start()
     yield
@@ -66,7 +80,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -161,7 +175,7 @@ async def calculate_dose(day_log: DayLog):
                 break
 
     if pm25 is None:
-        if day_log.latitude and day_log.longitude:
+        if day_log.latitude is not None and day_log.longitude is not None:
             api_key = os.getenv("OPENAQ_API_KEY")
             result = await fetch_nearest_pm25(
                 day_log.latitude, day_log.longitude, api_key
